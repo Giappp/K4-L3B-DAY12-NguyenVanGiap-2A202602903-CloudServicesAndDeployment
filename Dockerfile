@@ -20,15 +20,38 @@
 # Build thử: docker build -t day12-agent:prod .
 #            docker images day12-agent:prod     # xem dung lượng
 # ═══════════════════════════════════════════════════════════════════
-
-FROM python:3.11
+# Stage 1: Builder
+# Cài dependency ở đây, không mang compiler sang runtime
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy dependency đã cài từ builder
+COPY --from=builder /install /usr/local
+
+# Copy source code SAU khi dependency đã được xử lý
 COPY . .
 
-RUN pip install -r requirements.txt
+# Tạo user không có quyền root
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+ENV PORT=8000
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ.get(\"PORT\", \"8000\")}/health')" || exit 1
+
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
