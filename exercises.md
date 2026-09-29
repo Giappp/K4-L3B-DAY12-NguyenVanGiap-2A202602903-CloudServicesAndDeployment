@@ -6,7 +6,7 @@
 > Cách trả lời: thay dòng `> *Câu trả lời của bạn*` bằng câu trả lời.
 > `grade.py` đếm số câu đã trả lời (15 điểm cho 10 câu).
 >
-> Họ và tên: ..........................  Mã học viên: ..........................
+> Họ và tên: Nguyễn Văn Giáp  Mã học viên: 2A202602903
 
 ---
 
@@ -17,6 +17,7 @@ khi khởi động nếu thiếu biến môi trường. Hãy mô tả một tìn
 việc "chết sớm" này cứu bạn, so với việc để mặc định `"changeme"`.
 
 > *Câu trả lời của bạn*
+Việc không để giá trị mặc định giúp tránh trường hợp quên cài đặt API Key đặc biệt là trong trường hợp deploy lên production khi mà việc quên set biến API Key có thể gây ra lỗi bảo mật hoặc chết tính năng.
 
 ---
 
